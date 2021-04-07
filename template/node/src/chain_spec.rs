@@ -1,4 +1,4 @@
-use sp_core::{Pair, Public, sr25519};
+use sp_core::{Pair, Public, sr25519, H160};
 use frontier_template_runtime::{
 	AccountId, AuraConfig, BalancesConfig, EVMConfig, EthereumConfig, GenesisConfig, GrandpaConfig,
 	SudoConfig, SystemConfig, WASM_BINARY, Signature
@@ -8,6 +8,8 @@ use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{Verify, IdentifyAccount};
 use sc_service::ChainType;
 use std::collections::BTreeMap;
+use std::str::FromStr;
+use pallet_evm::GenesisAccount;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -155,8 +157,27 @@ fn testnet_genesis(
 			key: root_key,
 		},
 		pallet_evm: EVMConfig {
-			accounts: BTreeMap::new(),
+			accounts: evm_genesis(),
 		},
 		pallet_ethereum: EthereumConfig {},
 	}
+}
+
+
+fn evm_genesis() -> BTreeMap<H160, GenesisAccount> {
+	let genesis_account = GenesisAccount {
+		nonce: 0.into(),
+		balance: 1000000000000000000000u128.into(),
+		storage: BTreeMap::new(),
+		code: WASM_BINARY.unwrap().to_vec(),
+	};
+
+	let genesis_address = H160::from_str("8097c3C354652CB1EEed3E5B65fBa2576470678A").unwrap();
+
+	let mut genesis_map: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
+
+	genesis_map.insert(genesis_address, genesis_account);
+
+	genesis_map
+
 }
