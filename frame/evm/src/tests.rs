@@ -216,3 +216,14 @@ fn fee_deduction() {
 		assert_eq!(Balances::free_balance(&substrate_addr), 95);
 	});
 }
+
+#[test]
+fn h160_into_accountid_32() {
+	use super::HashedAddressMapping;
+
+	let eth_address: H160 = H160::from_str("8097c3C354652CB1EEed3E5B65fBa2576470678A").unwrap();
+	let account_id_32: AccountId32 = HashedAddressMapping::<BlakeTwo256>::into_account_id(eth_address);
+
+	assert_eq!(account_id_32, AccountId32::from_str("37e151225b96ae717e5e094b3e67f90f18c66ecad11024432df30cb38c007de7").unwrap());
+	println!("the ss58 format is {:?}", account_id_32);
+}
